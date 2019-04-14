@@ -5,7 +5,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "WAVreader.h"
 #include "RSA.h"
 #include <intrin.h>
 #include<boost/ref.hpp>
@@ -44,25 +43,26 @@ string printCharArray(unsigned char text[], int size)
 	return convertedText;
 }
 
-unsigned int changeEndianness32bit(unsigned char text[], int size)
+unsigned int changeEndianness(unsigned char text[], int size)
 {
-	unsigned int convertedText = text[0] |
-		(text[1] << 8) |
-		(text[2] << 16) |
-		(text[3] << 24);
-
-	return convertedText;
-}
-
-unsigned int changeEndianness16bit(unsigned char text[], int size)
-{
-	unsigned int convertedText = text[0] |
-		(text[1] << 8);
-	return convertedText;
+	unsigned int convertedText;
+	if (size == 4)
+	{
+		convertedText =	text[0] |
+						(text[1] << 8) |
+						(text[2] << 16) |
+						(text[3] << 24);
+    }
+	else if (size == 2)
+	{
+		convertedText = text[0] |
+						(text[1] << 8);
+	}
 	//return _byteswap_ushort(text);
+	return convertedText;
 }
 
-unsigned char buffer[sizeof(header)];
+
 void readHeader(const header_p &meta, FILE * infile, FILE * outfile)
 {
 	fread(meta, 1, sizeof(header), infile);
@@ -75,21 +75,21 @@ void readHeader(const header_p &meta, FILE * infile, FILE * outfile)
 
 
 	cout << " Chunk ID: " << printCharArray(meta->chunk_id, 4) << endl;
-	cout << " Chunk Size: " << changeEndianness32bit(meta->chunk_size, 4) << " bytes " << endl;
+	cout << " Chunk Size: " << changeEndianness(meta->chunk_size, 4) << " bytes " << endl;
 	cout << " Chunk Format: " << printCharArray(meta->format, 4) << endl;
 
 	cout << " SubChunk_1 ID: " << printCharArray(meta->subchunk1_id, 4) << endl;
-	cout << " SubChunk_1 Size: " << changeEndianness32bit(meta->subchunk1_size, 4) << " bytes " << endl;
-	cout << " SubChunk_1 Format: " << changeEndianness16bit(meta->audio_format, 2) << endl;
-	cout << " Number of Channels: " << changeEndianness16bit(meta->num_channels, 2) << endl;
-	cout << " Sample Rate: " << changeEndianness32bit(meta->sample_rate, 4) << " Hz" << endl;
-	cout << " Byte Rate: " << changeEndianness32bit(meta->byte_rate, 4) << endl;
-	cout << " Block Allign: " << changeEndianness16bit(meta->sample_rate, 2) << endl;
-	cout << " Bits per Sample: " << changeEndianness32bit(meta->bits_per_sample, 4) << " bits" << endl;
+	cout << " SubChunk_1 Size: " << changeEndianness(meta->subchunk1_size, 4) << " bytes " << endl;
+	cout << " SubChunk_1 Format: " << changeEndianness(meta->audio_format, 2) << endl;
+	cout << " Number of Channels: " << changeEndianness(meta->num_channels, 2) << endl;
+	cout << " Sample Rate: " << changeEndianness(meta->sample_rate, 4) << " Hz" << endl;
+	cout << " Byte Rate: " << changeEndianness(meta->byte_rate, 4) << endl;
+	cout << " Block Allign: " << changeEndianness(meta->sample_rate, 2) << endl;
+	cout << " Bits per Sample: " << changeEndianness(meta->bits_per_sample, 4) << " bits" << endl;
 
 
 	cout << " SubChunk_2 ID: " << printCharArray(meta->subchunk2_id, 4) << endl;
-	cout << " SubChunk_2 Size: " << changeEndianness32bit(meta->subchunk2_size, 4) << " bytes" << endl;
+	cout << " SubChunk_2 Size: " << changeEndianness(meta->subchunk2_size, 4) << " bytes" << endl;
 }
 
 void printRSA(RSA& rsa)
@@ -115,29 +115,30 @@ char* convertToASCII(string& plainText)
 }
 
 int main()
-
 {
-	constexpr char filepath[] = { "pcm16.wav" };
 	srand(time(NULL));
-	RSA rsa(3);
-	FILE * infile = fopen(filepath, "rb");				// Open wave file in read mode
-	FILE * outfile = fopen("Output.wav", "wb");				// Create output ( wave format) file in write mode
+	constexpr int BUFSIZE = 512;								// BUFSIZE can be changed according to the frame size required (eg:512)
+	int nrBytesRead;											// variable storing number of bytes returned
+	int count = 0;												// For counting number of frames in wave file.
 
-	constexpr int BUFSIZE = 512;							// BUFSIZE can be changed according to the frame size required (eg:512)
-	int count = 0;											// For counting number of frames in wave file.
-	char buff16[BUFSIZE];									// short int used for 16 bit as input data format is 16 bit PCM audio
+	constexpr char filepath[] = { "pcm16.wav" };
+	char buffer[BUFSIZE];										// short int used for 16 bit as input data format is 16 bit PCM audio
 	char noiseBuffer[BUFSIZE];
+	RSA rsa(3);
+	FILE * infile = fopen(filepath, "rb");						// Open wave file in read mode
+	FILE * outfile = fopen("Output.wav", "wb");					// Create output ( wave format) file in write mode
+
 	header_p meta = (header_p)malloc(sizeof(header));			// header_p points to a header struct that contains the wave file metadata fields
-	int nb;													// variable storing number of bytes returned
 	printRSA(rsa);
-	char* tmp;
+	/*char* tmp;
 	string plainText = "Hello World";
-	tmp = convertToASCII(plainText);
+	tmp = convertToASCII(plainText);*/
 	/*cout << "my PlainText in ASCII: " << (int)(*tmp) << endl;
 	int512_t encryptedText = rsa.encryptText((int)(*tmp));
-	cout << "my cipherText: " << encryptedText << endl;
+	cout << "my encryptedText: " << encryptedText << endl;
 	cout << "my decryptedText: " << rsa.decryptText(encryptedText) << endl;*/
-	//int512_t ans = rsa.RSApowersImproved(100, 1100);
+	
+	//int512_t ans = rsa.RSApowersImproved(2, 4);
 	//cout << "RSA_IMPROVED: " << ans << endl;
 
 	if (infile)
@@ -146,19 +147,13 @@ int main()
 
 		while (!feof(infile))
 		{
-			nb = fread(buff16, sizeof(char), BUFSIZE, infile);		// Reading data in chunks of BUFSIZE
-			count++;														// Incrementing Number of frames
+			nrBytesRead = fread(buffer, sizeof(char), BUFSIZE, infile);			// Reading data from infile to buffer in chunks of BUFSIZE
+			count++;															// Incrementing Number of frames
 
-			for (int i = 0; i < nb; i++)
-			{
-				//std::cout << "i: " << i << "buffer: " << (short int)buff16[i] << std::endl;
-				//noiseBuffer[i] = i;
-			}
+			rsa.encryptWAV(nrBytesRead, buffer);
+			//rsa.decryptWAV(nrBytesRead, buffer);
 
-			rsa.encryptWAV(count, nb, buff16);
-			//rsa.decryptWAV(count, nb, buff16);
-
-			fwrite(noiseBuffer, sizeof(char), nb, outfile);			// Writing read data into output file
+			fwrite(noiseBuffer, sizeof(char), nrBytesRead, outfile);			// Writing read data into output file
 		}
 		cout << "FRAMES: " << count << endl;
 	}
