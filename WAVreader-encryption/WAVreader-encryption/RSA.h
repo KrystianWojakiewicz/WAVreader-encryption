@@ -26,8 +26,8 @@ public:
 
 	void generatePrivatePublicKeyPair();
 
-	void encryptWAV(int count, int nb, char  buffer[512]);
-	void decryptWAV(int count, int nb, char  buffer[512]);
+	void encryptWAV(int nb, char  buffer[512]);
+	void decryptWAV(int nb, char  buffer[512]);
 
 	int512_t encryptText(int512_t plainText);
 	int512_t decryptText(int512_t cipherText);

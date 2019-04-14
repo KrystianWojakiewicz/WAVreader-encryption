@@ -25,7 +25,7 @@ struct Euclid
 
 /*HELPER FUNCTIONS*/
 
-int512_t myPow(int x, long p)
+int512_t myPow(int x, int p)
 {
 	if (p == 0) return 1;
 	if (p == 1) return x;
@@ -33,13 +33,6 @@ int512_t myPow(int x, long p)
 	int512_t tmp = myPow(x, p / 2);
 	if (p % 2 == 0) return tmp * tmp;
 	else return x * tmp * tmp;
-}
-
-int myPow2(int x, int p)
-{
-	if (p == 0) return 1;
-	if (p == 1) return x;
-	return x * myPow2(x, p - 1);
 }
 
 int512_t combine(int512_t a, int512_t b)
@@ -52,18 +45,18 @@ int512_t combine(int512_t a, int512_t b)
 
 bool RSA::combinationFound(int512_t power, int512_t exp)
 {
-	int totalExp = 0;
+	int512_t totalExp = 0;
 	int count = this->ans.size() - 1;
 	while (count >= 0)
 	{
-		int tmp;
+		int512_t tmp;
 		if (count == 0)
 		{
 			tmp = 0;
 		}
 		else
 		{
-			tmp = myPow2(2, count - 1);
+			tmp = myPow(2, count - 1);
 		}
 
 		totalExp += tmp;
@@ -106,7 +99,6 @@ int512_t RSA::RSApowersImproved(int512_t base, int512_t power)
 	std::vector<int>::iterator it;
 	for (it = this->powerAnswerSeq.begin(); it != this->powerAnswerSeq.end(); it++)
 	{
-		//std::cout << "powetAnswerSeq.at(i): " << *it << std::endl;
 		endResult = (endResult * ans.at(*it)) % this->modulus;
 	}
 	return endResult;
@@ -121,7 +113,22 @@ int512_t RSA::RSApowers(int512_t x, int512_t p) const
 	int512_t tmp = RSApowers(x, p / 2) % this->modulus;
 	if (p % 2 == 0) return tmp * tmp % this->modulus;
 	else return x * tmp * tmp % this->modulus;
-	//return (x * RSApowers(x, p - 1)) % modulus;
+}
+
+/*END OF HELPER FUNCTIONS*/
+
+
+
+RSA::RSA(int k) : coefficient(k)
+{
+	//this->modulus = generateModulus();
+	//generatePrivatePublicKeyPair();
+}
+
+
+RSA::~RSA()
+{
+
 }
 
 int512_t RSA::doEuclidsExtendedAlgorithm()
@@ -159,25 +166,9 @@ int512_t RSA::doEuclidsExtendedAlgorithm()
 	return this->privateKey;
 }
 
-/*END OF HELPER FUNCTIONS*/
-
-
-RSA::RSA(int k) : coefficient(k)
-{
-	//this->modulus = generateModulus();
-	//generatePrivatePublicKeyPair();
-}
-
-
-RSA::~RSA()
-{
-
-}
-
 int512_t RSA::generatePrime()
 {
 	int512_t randomNumer = rand() % (1 << 6);
-	//int512_t randomNumer = rand() % 100;
 
 	if ((randomNumer % 2) == 0)
 	{
@@ -209,7 +200,6 @@ int512_t RSA::generateModulus()
 
 void RSA::generatePrivatePublicKeyPair()
 {
-	//int512_t seed = generatePrime() +1;
 	do
 	{
 		this->publicKey = generatePrime();
@@ -252,53 +242,31 @@ std::string printCharArray(char text[], int size)
 	return convertedText;
 }
 
-void RSA::encryptWAV(int count, int nb, char  buffer[512])
+void RSA::encryptWAV(int nrBytesRead, char  buffer[512])
 {
 	std::string combinedBuffer = printCharArray(buffer, 512);
-	/*for (int i = 0; i < 100; i += 2)
+	
+	for (int i = 0; i < nrBytesRead; i++)
 	{
-		if (i == 0)
-		{
-			combinedBuffer = combine(buffer[i], buffer[i + 1]);
-		}
-		else
-		{
-			combine(combinedBuffer, buffer[i + 1]);
-		}
-	}*/
-
-	if (count >= 0)
-	{
-		for (int i = 26; i < 100; i += 1)
-		{
-			//std::cout << "count: " << count << "buffer: " << (short int)buffer[i] << std::endl;
-			int512_t message = RSApowers(static_cast<short int>(buffer[i]), publicKey);
-			//int512_t message = RSApowersImproved(buffer[i], publicKey);
-			//std::cout << "MESSAGE: " << message << std::endl;
-			buffer[i] = (char)message;
-			//buffer[i] = (int)rand() % SHRT_MAX;
-		}
+		int512_t message = RSApowers(static_cast<int8_t>(buffer[i]), publicKey);
+		//int512_t message = RSApowersImproved(buffer[i], publicKey);
+		buffer[i] = (char)message;
 	}
 }
 
-void RSA::decryptWAV(int count, int nb, char buffer[100])
+void RSA::decryptWAV(int nrBytesRead, char buffer[512])
 {
-	if (count % 1000 == 0)
+	for (int i = 0; i < nrBytesRead; i++)
 	{
-		for (int i = 0; i < nb / sizeof(char); i++)
-		{
-			int512_t message = RSApowers(static_cast<short int>(buffer[i]), privateKey);
-			buffer[i] = 100;//(short int)message;
-			//buffer[i] = (int)rand() % SHRT_MAX;
-		}
+		int512_t message = RSApowers(static_cast<int8_t>(buffer[i]), privateKey);
+		buffer[i] = (char)message;
 	}
 }
 
 int512_t RSA::encryptText(int512_t plainText)
 {
 	int512_t message = RSApowers(plainText, publicKey);
-	//std::cout << "MESSAGE: " << message << std::endl;
-	plainText = 100;
+	plainText = message;
 	return plainText;
 }
 
