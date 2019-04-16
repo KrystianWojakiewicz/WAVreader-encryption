@@ -5,49 +5,51 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pch.h"
+
 using namespace boost::multiprecision;
 
-class RSA
+template <class intType> class RSA
 {
 public:
 	RSA(int coeff);
 	~RSA();
 
-	int512_t generatePrime();
-	int512_t generateModulus();
-	int512_t getEulerTotient() const;
-	int512_t calculateEulerTotient();
-	int512_t RSApowers(int512_t base, int512_t power) const;
-	int512_t RSApowersImproved(int512_t base, int512_t power);
-	int512_t doEuclidsExtendedAlgorithm();
+	intType generatePrime();
+	intType generateModulus();
+	intType getEulerTotient() const;
+	intType calculateEulerTotient();
+	intType RSApowers(intType base, intType power) const;
+	intType RSApowersImproved(intType base, intType power);
+	intType doEuclidsExtendedAlgorithm();
 
-	bool isPrime(int512_t number) const;
-	bool combinationFound(int512_t power, int512_t exp);
+	bool isPrime(intType number) const;
+	bool combinationFound(intType power, intType exp);
 
 	void generatePrivatePublicKeyPair();
 
 	void encryptWAV(int nb, char  buffer[512]);
 	void decryptWAV(int nb, char  buffer[512]);
 
-	int512_t encryptText(int512_t plainText);
-	int512_t decryptText(int512_t cipherText);
+	intType encryptText(intType plainText);
+	intType decryptText(intType cipherText);
 
-	int512_t getPrivateKey() const;
-	int512_t getPublicKey() const;
-	int512_t getPrimeQ() const;
-	int512_t getPrimeP() const;
+	intType getPrivateKey() const;
+	intType getPublicKey() const;
+	intType getPrimeQ() const;
+	intType getPrimeP() const;
 
 private:
-	int512_t publicKey;
-	int512_t privateKey;
+	intType publicKey;
+	intType privateKey;
 
-	int512_t coefficient = 0;
-	int512_t modulus;
-	int512_t primeP;
-	int512_t primeQ;
-	int512_t eulerTotient;
+	intType coefficient = 0;
+	intType modulus;
+	intType primeP;
+	intType primeQ;
+	intType eulerTotient;
 
-	std::vector<int512_t> ans;
+	std::vector<intType> ans;
 	std::vector<int> powerAnswerSeq;
 };
 
+#include "RSAtemplate.cpp"

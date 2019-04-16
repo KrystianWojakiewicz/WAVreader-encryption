@@ -92,7 +92,8 @@ void readHeader(const header_p &meta, FILE * infile, FILE * outfile)
 	cout << " SubChunk_2 Size: " << changeEndianness(meta->subchunk2_size, 4) << " bytes" << endl;
 }
 
-void printRSA(RSA& rsa)
+template<class intType>
+void printRSA(RSA<intType>& rsa)
 {
 	cout << "-------RSA CONFIG-------" << endl;
 	cout << "modulus: " << rsa.generateModulus() << endl;
@@ -124,22 +125,20 @@ int main()
 	constexpr char filepath[] = { "pcm16.wav" };
 	char buffer[BUFSIZE];										// short int used for 16 bit as input data format is 16 bit PCM audio
 	char noiseBuffer[BUFSIZE];
-	RSA rsa(3);
+	RSA <short int> rsa(3);
 	FILE * infile = fopen(filepath, "rb");						// Open wave file in read mode
 	FILE * outfile = fopen("Output.wav", "wb");					// Create output ( wave format) file in write mode
 
 	header_p meta = (header_p)malloc(sizeof(header));			// header_p points to a header struct that contains the wave file metadata fields
 	printRSA(rsa);
-	/*char* tmp;
+	char* tmp;
 	string plainText = "Hello World";
-	tmp = convertToASCII(plainText);*/
-	/*cout << "my PlainText in ASCII: " << (int)(*tmp) << endl;
-	int512_t encryptedText = rsa.encryptText((int)(*tmp));
+	tmp = convertToASCII(plainText);
+	cout << "my PlainText in ASCII: " << (int)(*tmp) << endl;
+	int encryptedText = rsa.encryptText((int)(*tmp));
 	cout << "my encryptedText: " << encryptedText << endl;
-	cout << "my decryptedText: " << rsa.decryptText(encryptedText) << endl;*/
+	cout << "my decryptedText: " << rsa.decryptText(encryptedText) << endl;
 	
-	//int512_t ans = rsa.RSApowersImproved(2, 4);
-	//cout << "RSA_IMPROVED: " << ans << endl;
 
 	if (infile)
 	{
@@ -150,10 +149,10 @@ int main()
 			nrBytesRead = fread(buffer, sizeof(char), BUFSIZE, infile);			// Reading data from infile to buffer in chunks of BUFSIZE
 			count++;															// Incrementing Number of frames
 
-			rsa.encryptWAV(nrBytesRead, buffer);
+			//rsa.encryptWAV(nrBytesRead, buffer);
 			//rsa.decryptWAV(nrBytesRead, buffer);
 
-			fwrite(buffer, sizeof(char), nrBytesRead, outfile);			// Writing read data into output file
+			fwrite(buffer, sizeof(char), nrBytesRead, outfile);					// Writing read data into output file
 		}
 		cout << "FRAMES: " << count << endl;
 	}
