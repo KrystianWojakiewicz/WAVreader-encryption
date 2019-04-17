@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
+#include <random>
 #include <boost/multiprecision/cpp_int.hpp>
 
 template <class intType>
@@ -166,22 +167,25 @@ template <class intType> intType RSA<intType>::doEuclidsExtendedAlgorithm()
 
 template <class intType> intType RSA<intType>::generatePrime()
 {
-	intType randomNumer = rand() % (1 << 5);
+	std::random_device rand_dev;
+	std::mt19937 generator(rand_dev());
+	std::uniform_int_distribution<long long>  distr(3, RANDOM_NUMBER_RANGE);
 
-	if ((randomNumer % 2) == 0)
+	intType randomNumber = distr(generator);
+	if ((randomNumber  % 2) == 0)
 	{
-		randomNumer++;
+		randomNumber++;
 	}
 
 	while (true)
 	{
-		if (isPrime(randomNumer))
+		if (isPrime(randomNumber))
 		{
-			return randomNumer;
+			return randomNumber;
 		}
 		else
 		{
-			randomNumer += 2;
+			randomNumber += 2;
 		}
 	}
 
@@ -190,8 +194,11 @@ template <class intType> intType RSA<intType>::generatePrime()
 
 template <class intType> intType RSA<intType>::generateModulus()
 {
-	this->primeP = generatePrime();
-	this->primeQ = generatePrime();
+	while (this->primeP == this->primeQ)
+	{
+		this->primeP = generatePrime();
+		this->primeQ = generatePrime();
+	}
 
 	return this->modulus = primeP * primeQ;
 }
@@ -231,37 +238,45 @@ template <class intType> bool RSA<intType>::isPrime(intType number) const
 
 }
 
-template <class intType> void RSA<intType>::encryptWAV(int nrBytesRead, char  buffer[512])
+template <class intType> intType RSA<intType>::encryptWAV(int nrBytesRead, short int buffer[512])
 {
-	//std::string combinedBuffer = printCharArray(buffer, 512);
-	
 	for (int i = 0; i < nrBytesRead; i++)
 	{
-		intType message = RSApowers(static_cast<int>(buffer[i]), publicKey);
-		buffer[i] = (int)message;
+		cout << "ENCRYPTbuffer: " << (int)buffer[i] << endl;
+		intType message = RSApowers(static_cast<intType>(buffer[i]), publicKey);
+		buffer[i] = message;
+		cout << "ENCRYPTmessage: " << message << endl;
 	}
+	return buffer[0];
 }
 
-template <class intType> void RSA<intType>::decryptWAV(int nrBytesRead, char buffer[512])
+template <class intType> intType RSA<intType>::decryptWAV(int nrBytesRead, short int buffer[512])
 {
 	for (int i = 0; i < nrBytesRead; i++)
 	{
-		intType message = RSApowers(static_cast<int>(buffer[i]), privateKey);
-		buffer[i] = (int)message;
+		cout << "DECRYPTbuffer: " << (int)buffer[i] << endl;
+		intType message = RSApowers(static_cast<intType>(buffer[i]), privateKey);
+		buffer[i] = message;
+		cout << "DECRYPTmessage: " << message << endl;
 	}
+	return buffer[0];
 }
 
 template <class intType> intType RSA<intType>::encryptText(intType plainText)
 {
+	//cout << "ENCRYPTbuffer: " << plainText << endl;
 	intType message = RSApowers(plainText, publicKey);
 	plainText = message;
+	//cout << "ENCRYPTmessage: " << message << endl;
 	return plainText;
 }
 
 template <class intType> intType RSA<intType>::decryptText(intType cipherText)
 {
+	//cout << "DECRYPTbuffer: " << cipherText << endl;
 	intType message = RSApowers(cipherText, privateKey);
 	cipherText = message;
+	//cout << "DECRYPTmessage: " << message << endl;
 	return cipherText;
 }
 

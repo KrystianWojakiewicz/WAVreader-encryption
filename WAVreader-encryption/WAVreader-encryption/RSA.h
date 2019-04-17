@@ -27,8 +27,8 @@ public:
 
 	void generatePrivatePublicKeyPair();
 
-	void encryptWAV(int nb, char  buffer[512]);
-	void decryptWAV(int nb, char  buffer[512]);
+	intType encryptWAV(int nb, short int buffer[512]);
+	intType decryptWAV(int nb, short int buffer[512]);
 
 	intType encryptText(intType plainText);
 	intType decryptText(intType cipherText);
@@ -44,10 +44,10 @@ private:
 
 	intType coefficient = 0;
 	intType modulus;
-	intType primeP;
-	intType primeQ;
+	intType primeP = 0;
+	intType primeQ = 0;
 	intType eulerTotient;
-
+	const long RANDOM_NUMBER_RANGE = 1000;
 	std::vector<intType> ans;
 	std::vector<int> powerAnswerSeq;
 };
