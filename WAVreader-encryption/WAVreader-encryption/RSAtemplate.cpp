@@ -2,7 +2,6 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>
 #include <string>
-#include "pch.h"
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
