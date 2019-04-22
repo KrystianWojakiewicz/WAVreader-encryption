@@ -21,7 +21,7 @@ typedef struct header_file
 	unsigned char sample_rate[4];						//Little-endian
 	unsigned char byte_rate[4];							//Little-endian
 	unsigned char block_align[2];						//Little-endian
-	unsigned char bits_per_sample[4];					//Little-endian
+	unsigned char bits_per_sample[2];					//Little-endian
 
 	unsigned char subchunk2_id[4];						//Big-endian   "data"
 	unsigned char subchunk2_size[4];					//Little-endian
@@ -29,7 +29,7 @@ typedef struct header_file
 
 typedef struct header_file* header_p;
 
-static class Parser
+class Parser
 {
 public:
 	Parser(std::string filepath);

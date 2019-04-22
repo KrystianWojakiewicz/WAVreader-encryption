@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <iostream>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -16,9 +17,8 @@ public:
 
 	intType generatePrime();
 	intType generateModulus();
-	intType generateModulusPublicKeyInitialized();
+	intType generateModulusPublicKeyInitialized(); // for the case when you are initializing RSA encryption with a specified public key
 
-	
 	intType calculateEulerTotient();
 	intType RSApowers(intType base, intType power) const;
 	intType RSApowersImproved(intType base, intType power);
@@ -29,11 +29,8 @@ public:
 
 	void generatePrivatePublicKeyPair();
 
-	std::vector< short int> encryptWAV(int nb, std::vector< short int>& buffer);
-	std::vector< short int> decryptWAV(int nb, std::vector< short int>& buffer);
-
-	std::string encryptWAV2(std::string& buffer, std::vector<char>& mess);
-	std::string decryptWAV2(std::string& buffer, std::vector<char>& vect);
+	std::vector<cpp_int> encryptWAV(std::string& buffer, std::vector<char>& mess);
+	std::vector<char> decryptWAV(std::vector<cpp_int>& vect);
 
 	intType encryptText(intType plainText);
 	intType decryptText(intType cipherText);

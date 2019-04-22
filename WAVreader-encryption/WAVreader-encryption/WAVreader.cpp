@@ -5,88 +5,66 @@
 #include "RSA.h"
 #include "XOR.h"
 #include <fstream>
-#include <intrin.h>
 #include <vector>
 #include "Parser.h"
-
 
 using namespace std;
 
 
-
-char* convertToASCII(string& plainText)
-{
-	char* newText = new char[plainText.length() + 1];
-	for (int i = 0; i < plainText.length(); i++)
-	{
-		newText[i] = (int)plainText.at(i);
-	}
-	newText[plainText.length()] = '\0';
-	return newText;
-}
-
-
 int main()
 {
-	string filepath = "Bowed-Bass-C2.wav";
+	string filepath = "nature.wav";				    			// choose .wav file to be parsed
 	
+	constexpr int BUFFERSIZE = 512;							    // data chunk size
 
-	constexpr int BUFFERSIZE = 512;
-
-	RSA <uint128_t> rsa(3);
+	RSA <cpp_int> rsa(3);
 	XOR<uint512_t> xor;
 	Parser * parser = new Parser(filepath);
 	
- 	char plainText[] = { "Hello World" };
-	cout << "\n my PlainText in ASCII: " << (unsigned int)(*plainText) << endl;
-	cout << "-----------TEXT-------------" << endl;
-	uint128_t encryptedText = rsa.encryptText((unsigned int)(*plainText));
+	
+	cout << "-----------RSA-------------" << "\n\n";
+	char plainText[] = { "H" };
+	cout << "my PlainText in ASCII: " << (unsigned int)(*plainText) << endl;
+	cpp_int encryptedText = rsa.encryptText((unsigned int)(*plainText));
 	cout << "my encryptedText: " << encryptedText << endl;
 	cout << "my decryptedText: " << rsa.decryptText(encryptedText) << "\n\n";
 	
-	/*int128_t plainTextXOR[] = {1, 2, 3, 4, 5, 6};
+	cout << "-----------XOR-------------" << "\n\n";
+	string plainTextXor = "0123456789";
 	cout << "cipher: " << xor.getCipher() << endl;
-	cout << "-----------XOR-------------" << endl;
-	cout << "my encryptedXOR: " << *(xor.encryptXOR(plainTextXOR, 6)) << endl;
- 	cout << "my decryptedXOR: " << *(xor.encryptXOR(plainTextXOR, 6)) << "\n\n";
+	cout << "my encryptedXOR: "  << xor.encryptXorWav(plainTextXor) << endl;
+ 	cout << "my decryptedXOR: " << xor.encryptXorWav(plainTextXor) << "\n\n";
 
-	cout << "============HEADER============" << "\n\n";*/
 	
-	if (parser->xorInput && parser->rsaInput)
-	{
-		int nrBytesReadRSA = 0;																			// variable storing number of bytes returned
-		int nrBytesReadXor = 0;
-		int count = 0;																					// For counting number of frames in wave file.
-		std::vector<short int> rsaBuffer(BUFFERSIZE);
-		string xorBuffer;
-		xorBuffer.resize(BUFFERSIZE);
+	if (parser->xorInput)
+	{								
+		int nrBytesRead = 0;																				// variable storing number of bytes returned
+	
+		string buffer;
+		buffer.resize(BUFFERSIZE);
+		
 		std::vector<char> vect;
-		while ( !feof(parser->rsaInput) || !feof(parser->xorInput) )
+		std::vector<cpp_int> mess;
+		
+		while ( !feof(parser->xorInput) )
 		{
+			nrBytesRead = std::fread(&buffer[0], 1, buffer.size(), parser->xorInput);					// Reading data from infile to buffer in chunks of BUFSIZE
 			
-			nrBytesReadXor = std::fread(&xorBuffer[0], 1, xorBuffer.size(), parser->xorInput);									// Reading data from infile to buffer in chunks of BUFSIZE
-			//infile -= nrBytesReadXor;
-			nrBytesReadRSA = std::fread(rsaBuffer.data(), sizeof(short int), rsaBuffer.size(), parser->rsaInput);
-			count++;
 			
-			xor.encryptXorWav(xorBuffer);
-			std::fwrite(&xorBuffer[0], 1, nrBytesReadXor, parser->xorEncryptedOutput);
+			xor.encryptXorWav(buffer);
+			std::fwrite(&buffer[0], 1, nrBytesRead, parser->xorEncryptedOutput);
 			
-			xor.encryptXorWav(xorBuffer);
-			std::fwrite(&xorBuffer[0], 1, nrBytesReadXor, parser->xorOutput);
+			xor.encryptXorWav(buffer);
+			std::fwrite(&buffer[0], 1, nrBytesRead, parser->xorOutput);
 			
-			//rsa.encryptWAV(nrBytesReadRSA, rsaBuffer);
-			string message = rsa.encryptWAV2(xorBuffer, vect);
-			//rsa.decryptWAV(nrBytesReadRSA, rsaBuffer);
-			//message = rsa.decryptWAV2(message, vect);
-			std::fwrite(vect.data(), 1, vect.size(), parser->rsaEncryptedOutput);
+			mess = rsa.encryptWAV(buffer, vect);
+			std::fwrite(mess.data(), sizeof mess[0], mess.size(), parser->rsaEncryptedOutput);
+			
+			vect.clear();
+			vect = rsa.decryptWAV(mess);
 
-			//std::fwrite(&message[0], 1, message.size(), parser->rsaEncryptedOutput);
-		   // message = rsa.decryptWAV2(message);
-			//std::fwrite(&message[0], 1, message.size(), parser->rsaOutput);
-			//std::fwrite(rsaBuffer.data(), sizeof(short int), nrBytesReadRSA, parser->rsaEncryptedOutput);
+			std::fwrite(vect.data(), 1, vect.size(), parser->rsaOutput);
 		}
-		cout << "FRAMES: " << count << endl;
 	}
 	else
 	{
