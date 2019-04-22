@@ -21,29 +21,22 @@ public:
 	}
 	~XOR() {}
 
-	keyLength encryptXOR(keyLength* buffer, int nrBytesRead)
+	std::vector<keyLength> encryptXOR(std::vector<keyLength>& buffer)
 	{
-		int128_t a;
-		for (int i = 0; i < nrBytesRead; i++)
+		for (int i = 0; i < buffer.size(); i++)
 		{
-			/*int128_t a = boost::lexical_cast<int128_t, long long> (buffer[i]);
-			a = a ^ cipher;*/
 		    buffer[i] = buffer[i] ^ this->cipher;
-			//cout << a << endl;
 		}
-		return a;
+		return buffer;
 	}
 
 	std::string encryptXorWav(std::string& combinedBuffer)
 	{
-		//cout << "before cipher: " << combinedBuffer << endl;
-
 		std::string a = boost::lexical_cast<std::string>(this->cipher);
 		for (int i = 0; i < combinedBuffer.size() && i < a.size(); i++)
 		{
 			combinedBuffer[i] = combinedBuffer[i] ^ a[i];
 		}
-		//cout << "after cipher: " << combinedBuffer << "\n\n\n";
 		
 		return combinedBuffer;
 	}
@@ -64,5 +57,3 @@ private:
 
 	keyLength cipher;
 };
-
-//#include "XORtemplate.cpp"

@@ -112,24 +112,24 @@ template <class intType>  intType RSA<intType>::RSApowers(intType x, intType p) 
 
 template <class intType> RSA<intType>::RSA()
 {
-	cout << "-------RSA CONFIG-------" << endl;
-	cout << "modulus: " << generateModulus() << endl;
+	cout << "-------RSA CONFIG-------" << "\n\n";
+	cout << "\nmodulus: " << generateModulus() << endl;
 	cout << "Random Primes: " << getPrimeP() << " :: " << getPrimeQ() << endl;
 	cout << "Euler Totient: " << calculateEulerTotient() << endl;
 	generatePrivatePublicKeyPair();
 	cout << "Public Key: " << getPublicKey() << endl;
-	cout << "Private Key: " << getPrivateKey() << endl;
+	cout << "Private Key: " << getPrivateKey() << "\n\n";
 }
 
 template <class intType> RSA<intType>::RSA(intType publicKeyDefault) : publicKey(publicKeyDefault)
 {
-	cout << "-------RSA CONFIG-------" << endl;
+	cout << "-------RSA CONFIG-------" << "\n\n";
 	cout << "modulus: " << generateModulusPublicKeyInitialized() << endl;
 	cout << "Random Primes: " << getPrimeP() << " :: " << getPrimeQ() << endl;
 	cout << "Euler Totient: " << calculateEulerTotient() << endl;
 	doEuclidsExtendedAlgorithm();
 	cout << "Public Key: " << getPublicKey() << endl;
-	cout << "Private Key: " << getPrivateKey() << endl;
+	cout << "Private Key: " << getPrivateKey() << "\n\n";
 }
 
 template <class intType> intType RSA<intType>::generateModulusPublicKeyInitialized()
@@ -164,10 +164,6 @@ template <class intType> void RSA<intType>::generatePrivatePublicKeyPair()
 
 template <class intType> intType RSA<intType>::generatePrime()
 {
-	/*std::random_device rand_dev;
-	std::mt19937 generator(rand_dev());
-	std::uniform_int_distribution<intType>  distr(3, RANDOM_NUMBER_RANGE);*/
-	//std::numeric_limits<intType>::max()
 	boost::random::mt19937 gen(std::time(0));
 	boost::random::uniform_int_distribution<intType> dist( 1, std::numeric_limits<short int>::max());
 	intType randomNumber = dist(gen);
@@ -245,52 +241,10 @@ template <class intType> intType RSA<intType>::calculateEulerTotient()
 	return eulerTotient = (primeP - 1) * (primeQ - 1);
 }
 
-
-template <class intType> std::vector< short int> RSA<intType>::encryptWAV(int nrBytesRead, std::vector< short int>& buffer)
-{
-	for (int i = 0; i < nrBytesRead; i++)
-	{
-		//cout << "ENCRYPTbuffer: " << (short int)buffer[i] << endl;
-		boost::multiprecision::cpp_int pow(this->publicKey);
-		boost::multiprecision::cpp_int mod(this->modulus);
-		boost::multiprecision::cpp_int base(buffer[i]);
-		boost::multiprecision::cpp_int result = powm(base, pow, mod);
-		buffer[i] = boost::lexical_cast<short int> (result);
-		//intType message = RSApowers(buffer[i], publicKey);
-		//buffer[i] = boost::lexical_cast<short int>(message);
-		//cout << "DECRYPTED message: " << (short int)buffer[i] << endl;
-	}
-	return buffer;
-}
-
-template <class intType> std::vector< short int> RSA<intType>::decryptWAV(int nrBytesRead, std::vector< short int>& buffer)
-{
-	for (int i = 0; i < nrBytesRead; i++)
-	{
-		//cout << "DECRYPTbuffer: " << (int)buffer[i] << endl;
-		// message = RSApowers(buffer[i], privateKey);
-		//buffer[i] = boost::lexical_cast<short int>(message);
-		//cout << "DECRYPTmessage: " << message << endl;
-		boost::multiprecision::cpp_int pow(this->privateKey);
-		boost::multiprecision::cpp_int mod(this->modulus);
-		boost::multiprecision::cpp_int base(buffer[i]);
-		boost::multiprecision::cpp_int result = powm(base, pow, mod);
-		buffer[i] = boost::lexical_cast<short int> (result);
-	}
-	return buffer;
-}
-
-template <class intType> std::string RSA<intType>::encryptWAV2(std::string& buffer, std::vector<char>& vect)
+template <class intType> std::vector<cpp_int> RSA<intType>::encryptWAV(std::string& buffer)
 {	
-	string message;
 	std::vector<cpp_int> mess( buffer.size() );
-	//cout << "message Before encryption: ";
-	for (int i = 0; i < buffer.size(); i++)
-	{
-		//cout << (unsigned short)buffer[i] << " ";
-	}
-	
-	//cout << "\nmessage After encryption: ";
+
 	for (int i = 0; i < buffer.size(); i++)
 	{
 		boost::multiprecision::cpp_int pow(this->publicKey);
@@ -298,63 +252,50 @@ template <class intType> std::string RSA<intType>::encryptWAV2(std::string& buff
 		boost::multiprecision::cpp_int base( (short)buffer[i] );
 		boost::multiprecision::cpp_int result = powm(base, pow, mod);
 		
-		//boost::multiprecision::cpp_int pow2(this->privateKey);
-	   // result = powm(result, pow2, mod);
-		//message += boost::lexical_cast<string> (result);
-		mess[i] = boost::lexical_cast<long> (result);	
+		mess[i] = result;	
 	}
 
-	vect.resize( mess.size() );
-	for (int i = 0; i < mess.size(); i++)
-	{
-		vect[i] = static_cast<char>(mess[i]);
-	}
-	
-	return message;
+	return mess;
 }
 
-template <class intType> std::string RSA<intType>::decryptWAV2(std::string& buffer, std::vector<char>& vect)
+template <class intType> std::vector<char> RSA<intType>::decryptWAV(std::vector<cpp_int>& vect)
 {
-	string message = ;
-	std::vector<cpp_int> mess(buffer.size());
-	for (int i = 0; i < buffer.size(); i++)
+	std::vector<cpp_int> mess( vect.size() );
+	for (int i = 0; i < vect.size(); i++)
 	{
 		boost::multiprecision::cpp_int pow(this->privateKey);
 		boost::multiprecision::cpp_int mod(this->modulus);
-		boost::multiprecision::cpp_int base( (short)buffer[i] );
+		boost::multiprecision::cpp_int base( vect[i] );
 		boost::multiprecision::cpp_int result = powm(base, pow, mod);
 		
 		mess[i] = boost::lexical_cast<short> (result);
 	}
 
-	vect.resize(mess.size());
+	std::vector<char> decrypted( mess.size() );
 	for (int i = 0; i < mess.size(); i++)
 	{
-		vect[i] = static_cast<char>(mess[i]);
+		decrypted[i] = static_cast<char>(mess[i]);
 	}
 
-	return message;
+	return decrypted;
 }
 
 template <class intType> intType RSA<intType>::encryptText(intType plainText)
 {
-	//cout << "ENCRYPTbuffer: " << plainText << endl;
 	intType message = RSApowers(plainText, publicKey);
 	plainText = message;
-	//cout << "ENCRYPTmessage: " << message << endl;
 	return plainText;
 }
 
 template <class intType> intType RSA<intType>::decryptText(intType cipherText)
 {
-	//cout << "DECRYPTbuffer: " << cipherText << endl;
 	intType message = RSApowers(cipherText, privateKey);
 	cipherText = message;
-	//cout << "DECRYPTmessage: " << message << endl;
 	return cipherText;
 }
 
 
+// GETTERS 
 template <class intType> intType RSA<intType>::getPrimeQ() const
 {
 	return this->primeQ;
