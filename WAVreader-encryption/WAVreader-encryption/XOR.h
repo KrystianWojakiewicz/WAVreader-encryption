@@ -34,24 +34,25 @@ public:
 		return a;
 	}
 
-	keyLength encryptXorWav(uint128_t& combinedBuffer)
+	std::string encryptXorWav(std::string& combinedBuffer)
 	{
 		//cout << "before cipher: " << combinedBuffer << endl;
-		combinedBuffer = combinedBuffer ^ this->cipher;
+
+		std::string a = boost::lexical_cast<std::string>(this->cipher);
+		for (int i = 0; i < combinedBuffer.size() && i < a.size(); i++)
+		{
+			combinedBuffer[i] = combinedBuffer[i] ^ a[i];
+		}
 		//cout << "after cipher: " << combinedBuffer << "\n\n\n";
-		combinedBuffer = combinedBuffer ^ this->cipher;
-		//cout << "after DECIPHER: " << combinedBuffer << "\n\n\n";
+		
 		return combinedBuffer;
 	}
 
 	keyLength generateRandomNumber()
 	{
 		boost::random::mt19937 gen( std::time(0) );
-		boost::random::uniform_int_distribution<uint128_t> dist(1, std::numeric_limits<uint128_t>::max());
-		/*std::random_device rand_dev;
-		std::mt19937 generator(rand_dev());
-		std::uniform_int_distribution<long long>  distr(3, INT64_MAX);
-		return distr(gen);*/
+		boost::random::uniform_int_distribution<keyLength> dist(1, std::numeric_limits<keyLength>::max());
+		
 		return dist(gen);
 	}
 
