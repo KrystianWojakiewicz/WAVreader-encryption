@@ -260,7 +260,8 @@ template <class intType> std::vector<cpp_int> RSA<intType>::encryptWAV(std::stri
 
 template <class intType> std::vector<char> RSA<intType>::decryptWAV(std::vector<cpp_int>& vect)
 {
-	std::vector<cpp_int> mess( vect.size() );
+	std::vector<char> mess( vect.size() );
+	
 	for (int i = 0; i < vect.size(); i++)
 	{
 		boost::multiprecision::cpp_int pow(this->privateKey);
@@ -268,16 +269,10 @@ template <class intType> std::vector<char> RSA<intType>::decryptWAV(std::vector<
 		boost::multiprecision::cpp_int base( vect[i] );
 		boost::multiprecision::cpp_int result = powm(base, pow, mod);
 		
-		mess[i] = boost::lexical_cast<short> (result);
+		mess[i] = static_cast<char> (result);
 	}
 
-	std::vector<char> decrypted( mess.size() );
-	for (int i = 0; i < mess.size(); i++)
-	{
-		decrypted[i] = static_cast<char>(mess[i]);
-	}
-
-	return decrypted;
+	return mess;
 }
 
 template <class intType> intType RSA<intType>::encryptText(intType plainText)

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -33,6 +34,7 @@ public:
 	std::string encryptXorWav(std::string& combinedBuffer)
 	{
 		std::string a = boost::lexical_cast<std::string>(this->cipher);
+
 		for (int i = 0; i < combinedBuffer.size() && i < a.size(); i++)
 		{
 			combinedBuffer[i] = combinedBuffer[i] ^ a[i];

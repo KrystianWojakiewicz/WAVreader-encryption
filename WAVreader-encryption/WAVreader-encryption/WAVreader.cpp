@@ -13,7 +13,7 @@ using namespace std;
 
 int main()
 {
-	string filepath = "nature.wav";				    			// choose .wav file to be parsed
+	string filepath = "bass.wav";				    			// choose .wav file to be parsed
 	
 	constexpr int BUFFERSIZE = 512;							    // data chunk size
 
@@ -57,12 +57,10 @@ int main()
 			xor.encryptXorWav(buffer);
 			std::fwrite(&buffer[0], 1, nrBytesRead, parser->xorOutput);
 			
-			mess = rsa.encryptWAV(buffer, vect);
+			mess = rsa.encryptWAV(buffer);
 			std::fwrite(mess.data(), sizeof mess[0], mess.size(), parser->rsaEncryptedOutput);
 			
-			vect.clear();
 			vect = rsa.decryptWAV(mess);
-
 			std::fwrite(vect.data(), 1, vect.size(), parser->rsaOutput);
 		}
 	}
