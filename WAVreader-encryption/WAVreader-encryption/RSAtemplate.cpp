@@ -167,6 +167,7 @@ template <class intType> intType RSA<intType>::generatePrime()
 	boost::random::mt19937 gen(std::time(0));
 	boost::random::uniform_int_distribution<intType> dist( 1, std::numeric_limits<short int>::max());
 	intType randomNumber = dist(gen);
+	
 	if ((randomNumber % 2) == 0)
 	{
 		randomNumber++;
@@ -205,8 +206,10 @@ template <class intType> intType RSA<intType>::doEuclidsExtendedAlgorithm()
 {
 	Euclid<intType> leftColumn(this->eulerTotient, this->publicKey);
 	Euclid<intType> rightColumn(this->eulerTotient, 1);
+	
 	intType division;
 	intType tmp;
+	
 	while (leftColumn.divider != 1)
 	{
 		division = leftColumn.base / leftColumn.divider;
@@ -301,8 +304,7 @@ template <class intType> intType RSA<intType>::getPrimeP() const
 	return this->primeP;
 }
 
-template<class intType>
-intType RSA<intType>::getModulus() const
+template<class intType> intType RSA<intType>::getModulus() const
 {
 	return this->modulus;
 }
