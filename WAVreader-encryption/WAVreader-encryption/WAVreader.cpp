@@ -7,15 +7,41 @@
 #include <fstream>
 #include <vector>
 #include "Parser.h"
+#include "WAVreader.h"
 
 using namespace std;
 
 
-int main()
+std::string addSineToWave(int count, int nrBytesRead, std::string sineBuffer, Parser* parser, int signalStartSec, int signalEndSec, int period)
 {
-	string filepath = "bass.wav";				    			// choose .wav file to be parsed
+	int ampl = 0;
+	unsigned int byteRate = parser->changeEndianness(parser->meta->byte_rate, 4);
+
+	int start = byteRate * signalStartSec / BUFSIZ;
+	int end = byteRate * signalEndSec / BUFSIZ;
+
+	if (count > start  && count < end)
+	{
+		for (int i = 0; i < nrBytesRead; i++)
+		{
+			if (i % period < period / 2)
+			{
+				sineBuffer[i] = ampl++;
+			}
+			else
+			{
+				sineBuffer[i] = ampl--;
+			}
+		}
+	}
+	return sineBuffer;
+}
+
+int main()
+{		
+	string filepath = "nature.wav";				    				// choose .wav file to be parsed
 	
-	constexpr int BUFFERSIZE = 512;							    // data chunk size
+	constexpr int BUFFERSIZE = BUFSIZ;							    // data chunk size
 
 	RSA <cpp_int> rsa(3);
 	XOR<uint512_t> xor;
@@ -36,20 +62,27 @@ int main()
  	cout << "my decryptedXOR: " << xor.encryptXorWav(plainTextXor) << "\n\n";
 
 	
-	if (parser->xorInput)
+	if (parser->inputFile)
 	{								
 		int nrBytesRead = 0;																				// variable storing number of bytes returned
-	
+		int count = 0;																						// frame counter
+
 		string buffer;
 		buffer.resize(BUFFERSIZE);
 		
+		string sineBuffer;
+		sineBuffer.resize(BUFFERSIZE);
+
 		std::vector<char> vect;
 		std::vector<cpp_int> mess;
 		
-		while ( !feof(parser->xorInput) )
+		while ( !feof(parser->inputFile) )
 		{
-			nrBytesRead = std::fread(&buffer[0], 1, buffer.size(), parser->xorInput);					// Reading data from infile to buffer in chunks of BUFSIZE
+			nrBytesRead = std::fread(&buffer[0], 1, buffer.size(), parser->inputFile);						// Reading data from infile to buffer in chunks of BUFSIZE
+			count++;
 			
+			sineBuffer = addSineToWave(count, nrBytesRead, buffer, parser, 3, 7, 256);
+			std::fwrite(&sineBuffer[0], 1, nrBytesRead, parser->sineOutput);
 			
 			xor.encryptXorWav(buffer);
 			std::fwrite(&buffer[0], 1, nrBytesRead, parser->xorEncryptedOutput);
@@ -63,6 +96,8 @@ int main()
 			vect = rsa.decryptWAV(mess);
 			std::fwrite(vect.data(), 1, vect.size(), parser->rsaOutput);
 		}
+
+		cout << "FRAMES: " << count << endl;
 	}
 	else
 	{

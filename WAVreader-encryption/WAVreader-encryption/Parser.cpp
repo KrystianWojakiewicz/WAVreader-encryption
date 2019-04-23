@@ -3,28 +3,31 @@
 
 Parser::Parser(std::string filepath)
 {
-	header_p meta = (header_p)malloc(sizeof(header));							// header_p points to a header struct that contains the wave file metadata fields
+    meta = (header_p)malloc(sizeof(header));							// header_p points to a header struct that contains the wave file metadata fields
 								
-	xorInput = fopen(&filepath[0], "rb");
+	inputFile = fopen(&filepath[0], "rb");
 	xorOutput = fopen("xorOutput.wav", "wb");
 	xorEncryptedOutput = fopen("xorEncryptedOutput.wav", "wb");
 
-	rsaInput = fopen(&filepath[0], "rb");
 	rsaOutput = fopen("rsaOutput.wav", "wb");
 	rsaEncryptedOutput = fopen("rsaEncryptedOutput.wav", "wb");
 
-	readHeader(meta, rsaInput, xorOutput, xorEncryptedOutput, rsaOutput, rsaEncryptedOutput); // write header data to outpuFiles 
+	sineOutput = fopen("sineOutput.wav", "wb");
+
+	readHeader(meta, inputFile, xorOutput, xorEncryptedOutput, rsaOutput, rsaEncryptedOutput, sineOutput); // write header data to outpuFiles 
 }
 
 Parser::~Parser()
 {
-	std::fclose(rsaInput);
-	std::fclose(xorInput);
-
+	std::fclose(inputFile);
+	
 	std::fclose(xorOutput);
 	std::fclose(xorEncryptedOutput);
+	
 	std::fclose(rsaOutput);
 	std::fclose(rsaEncryptedOutput);
+
+	delete meta;
 }
 
 std::string Parser::printCharArray(unsigned char text[], int size)
@@ -56,15 +59,15 @@ unsigned int Parser::changeEndianness(unsigned char text[], int size)
 	return convertedText;
 }
 
-void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput, FILE * xorEncryptedOutput, FILE * rsaOutput, FILE * rsaEncryptedOutput)
+void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput, FILE * xorEncryptedOutput, FILE * rsaOutput, FILE * rsaEncryptedOutput, FILE * sineOutput)
 {
 	std::fread(meta, 1, sizeof(header) -8, rsaInput);
 	
 	//check for empty spaces after bits_per_sample because the standard allows for them
-	char tmp[] = { meta->bits_per_sample[1] };
-	while (tmp[0] != 'd')
+	char tmp = 0;
+	while (tmp != 'd')
 	{
-		int nb = std::fread(tmp, 1, 1, rsaInput);
+		int nb = std::fread(&tmp, 1, 1, rsaInput);
 	}
 
 	meta->subchunk2_id[0] = 'd';
@@ -76,6 +79,7 @@ void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput,
 	std::fwrite(meta, 1, sizeof(*meta), xorEncryptedOutput);
 	std::fwrite(meta, 1, sizeof(*meta), rsaOutput);
 	std::fwrite(meta, 1, sizeof(*meta), rsaEncryptedOutput);
+	std::fwrite(meta, 1, sizeof(*meta), sineOutput);
 
 	//print header data to console
 	std::cout << "----------.WAV HEADER----------" << "\n\n";

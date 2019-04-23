@@ -35,16 +35,22 @@ public:
 	Parser(std::string filepath);
 	~Parser();
 
-	FILE * xorInput;
+	FILE * inputFile;
+	
 	FILE * xorOutput;
 	FILE * xorEncryptedOutput;
 	
-	FILE * rsaInput;
 	FILE * rsaOutput;
 	FILE * rsaEncryptedOutput;
 
-private:
-	std::string printCharArray(unsigned char text[], int size);
+	FILE * sineOutput;
+
+	header_p meta;
+
 	unsigned int changeEndianness(unsigned char text[], int size);
-	void readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput, FILE * xorEncryptedOutput, FILE * rsaOutput, FILE * rsaEncryptedOutput);
+private:
+
+	std::string printCharArray(unsigned char text[], int size);
+	void readHeader(const header_p &meta, FILE * inputFile, FILE * xorOutput, FILE * xorEncryptedOutput,
+										  FILE * rsaOutput, FILE * rsaEncryptedOutput, FILE * sineOutput);
 };
