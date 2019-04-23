@@ -2,11 +2,11 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <stdlib.h>
 #include "RSA.h"
 #include "XOR.h"
 #include <fstream>
 #include <vector>
+#include <string>
 
 typedef struct header_file
 {

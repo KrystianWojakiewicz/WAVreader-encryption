@@ -1,13 +1,9 @@
 #include "pch.h"
-#include <stdlib.h>     /* srand, rand */
 #include <time.h>
 #include <string>
-#include <stdio.h>
-#include <cmath>
 #include <iostream>
-#include <random>
-#include <boost/multiprecision/cpp_int.hpp>
 #include "RSA.h"
+#include <boost/multiprecision/cpp_int.hpp>
 
 template <class intType>
 struct Euclid
