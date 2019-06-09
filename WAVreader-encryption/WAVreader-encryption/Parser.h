@@ -43,6 +43,9 @@ public:
 	FILE * rsaOutput;
 	FILE * rsaEncryptedOutput;
 
+	FILE * aesOutput;
+	FILE * aesEncryptedOutput;
+
 	FILE * sineOutput;
 
 	header_p meta;
@@ -52,5 +55,5 @@ private:
 
 	std::string printCharArray(unsigned char text[], int size);
 	void readHeader(const header_p &meta, FILE * inputFile, FILE * xorOutput, FILE * xorEncryptedOutput,
-										  FILE * rsaOutput, FILE * rsaEncryptedOutput, FILE * sineOutput);
+										  FILE * rsaOutput, FILE * rsaEncryptedOutput, FILE* aesOutput, FILE* aesEncryptedOutput, FILE * sineOutput);
 };

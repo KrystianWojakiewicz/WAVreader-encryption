@@ -77,8 +77,9 @@ void sampleXOR(XOR<boost::multiprecision::uint1024_t> &xor)
 void sampleAES(AESAlgorithm &aes)
 {
 	std::cout << "-----------AES-------------" << "\n\n";
-	std::cout << "Encrypted AES: "; aes.EncryptEAS(); std::cout << "\n";
-	std::cout << "Decrypted AES: "; aes.DecryptEAS(); std::cout << "\n";
+	std::string plainText = "HELLO WORLD!";
+	std::cout << "Encrypted AES: " << aes.encryptWAV(plainText, plainText.size()); std::cout << "\n";
+	std::cout << "Decrypted AES: " << aes.decryptWAV(plainText.size()); std::cout << "\n";
 }
 
 
@@ -134,6 +135,12 @@ int main()
 			
 			vect = rsa.decryptWAV(mess);
 			std::fwrite(vect.data(), 1, vect.size(), parser->rsaOutput);
+
+			std::string aesCipherText = aes.encryptWAV(buffer, nrBytesRead); 
+			std::fwrite(&aesCipherText[0], 1, nrBytesRead, parser->aesEncryptedOutput);
+
+			std::string aesDecrypted = aes.decryptWAV(nrBytesRead);
+			std::fwrite(&aesDecrypted[0], 1, nrBytesRead, parser->aesOutput);
 		}
 
 		std::cout << "FRAMES: " << count << std::endl;

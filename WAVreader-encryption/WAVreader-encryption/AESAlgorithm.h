@@ -8,13 +8,15 @@
 
 using CryptoPP::AutoSeededRandomPool;
 using CryptoPP::SecByteBlock;
-
+using CryptoPP::byte;
 
 class AESAlgorithm
 {
 public:
 	AESAlgorithm()
 	{
+		AutoSeededRandomPool rnd;
+
 		SecByteBlock key(CryptoPP::AES::DEFAULT_KEYLENGTH);
 		rnd.GenerateBlock(key, key.size());
 		this->key = key;
@@ -24,37 +26,30 @@ public:
 		this->iv = iv;
 	}
 
-	void EncryptEAS()
+	std::string encryptWAV(std::string& buffer, int bufferSize)
 	{
-		CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cfbEncryption(key, key.size(), iv);
-		cfbEncryption.ProcessData(this->myCipherText, this->myPlainText, 12);
+		SecByteBlock plainText((const byte*)buffer.data(), bufferSize);
 		
-		printText(this->myCipherText);
+		SecByteBlock output(bufferSize);
+		CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cfbEncryption(key, key.size(), iv);
+		cfbEncryption.ProcessData(output, (const byte*)buffer.data(), bufferSize);
+		this->myCipherText = output;
+		
+		return std::string( (const char*)output.data(), output.size() );
 	}
 
-	void DecryptEAS()
+	std::string decryptWAV(int bufferSize)
 	{
-		CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cfbDecryption(key, key.size(), iv);
-		cfbDecryption.ProcessData(this->myDecryptedText, this->myCipherText, 12);
+		SecByteBlock output(bufferSize);
+		CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cfbEncryption(key, key.size(), iv);
+		cfbEncryption.ProcessData(output, this->myCipherText, bufferSize);
+		this->myDecryptedText = output;
 
-		printText(this->myDecryptedText);
+		return std::string( (const char*)output.data(), output.size() );
 	}
+
 
 private:
-	std::string ciphertext, plaintext, decryptedText;
-	AutoSeededRandomPool rnd;
-	SecByteBlock key, iv;
-	CryptoPP::byte myPlainText[12] = "Hello World";
-	CryptoPP::byte myCipherText[12], myDecryptedText[12];
+	SecByteBlock key, iv, myCipherText, myDecryptedText;
 	
-
-
-	void printText(CryptoPP::byte* text)
-	{
-		for (int i = 0; i < std::strlen((char*)text) + 1; i++)
-		{
-			std::cout << static_cast<CryptoPP::byte>(text[i]);
-		}
-		std::cout << std::endl;
-	}
 };

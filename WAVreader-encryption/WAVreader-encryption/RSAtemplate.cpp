@@ -20,7 +20,7 @@ struct Euclid
 
 /*HELPER FUNCTIONS*/
 
-template <class intType> intType myPow(intType x, intType p)
+template <class intType> intType myPow(intType x, intType p) // TODO:remove
 {
 	if (p == 0) return 1;
 	if (p == 1) return x;
@@ -30,7 +30,7 @@ template <class intType> intType myPow(intType x, intType p)
 	else return x * tmp * tmp;
 }
 
-template <class intType> bool RSA<intType>::combinationFound(intType power, intType exp)
+template <class intType> bool RSA<intType>::combinationFound(intType power, intType exp) // TODO:remove
 {
 	intType totalExp = 0;
 	int count = this->ans.size() - 1;
@@ -66,14 +66,14 @@ template <class intType> bool RSA<intType>::combinationFound(intType power, intT
 	return false;
 }
 
-template <class intType> intType RSA<intType>::RSApowersImproved(intType base, intType power)
+template <class intType> intType RSA<intType>::RSApowersImproved(intType base, intType power) // TODO:remove
 {
 	intType exp = 0;
 	while (!combinationFound(power, exp))
 	{
 		if (exp == 0)
 		{
-			this->ans.push_back(1);// 2^0
+			this->ans.push_back(1); // 2^0
 			exp = 1;
 			continue;
 		}

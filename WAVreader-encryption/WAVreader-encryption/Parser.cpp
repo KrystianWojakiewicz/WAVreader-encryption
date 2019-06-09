@@ -12,9 +12,12 @@ Parser::Parser(std::string filepath)
 	rsaOutput = fopen("rsaOutput.wav", "wb");
 	rsaEncryptedOutput = fopen("rsaEncryptedOutput.wav", "wb");
 
+	aesOutput = fopen("aesOutput.wav", "wb");
+	aesEncryptedOutput = fopen("aesEncryptedOutput.wav", "wb");
+
 	sineOutput = fopen("sineOutput.wav", "wb");
 
-	readHeader(meta, inputFile, xorOutput, xorEncryptedOutput, rsaOutput, rsaEncryptedOutput, sineOutput); // write header data to outpuFiles 
+	readHeader(meta, inputFile, xorOutput, xorEncryptedOutput, rsaOutput, rsaEncryptedOutput, aesOutput, aesEncryptedOutput, sineOutput); // write header data to outpuFiles 
 }
 
 Parser::~Parser()
@@ -26,6 +29,9 @@ Parser::~Parser()
 	
 	std::fclose(rsaOutput);
 	std::fclose(rsaEncryptedOutput);
+
+	std::fclose(aesOutput);
+	std::fclose(aesEncryptedOutput);
 
 	delete meta;
 }
@@ -59,7 +65,8 @@ unsigned int Parser::changeEndianness(unsigned char text[], int size)
 	return convertedText;
 }
 
-void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput, FILE * xorEncryptedOutput, FILE * rsaOutput, FILE * rsaEncryptedOutput, FILE * sineOutput)
+void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput, FILE * xorEncryptedOutput, FILE * rsaOutput, 
+									FILE * rsaEncryptedOutput, FILE* aesOutput, FILE* aesEncryptedOutput, FILE * sineOutput)
 {
 	std::fread(meta, 1, sizeof(header) -8, rsaInput);
 	
@@ -78,8 +85,13 @@ void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput,
 	//Initialize all output files with header data
 	std::fwrite(meta, 1, sizeof(*meta), xorOutput);
 	std::fwrite(meta, 1, sizeof(*meta), xorEncryptedOutput);
+
 	std::fwrite(meta, 1, sizeof(*meta), rsaOutput);
 	std::fwrite(meta, 1, sizeof(*meta), rsaEncryptedOutput);
+
+	std::fwrite(meta, 1, sizeof(*meta), aesOutput);
+	std::fwrite(meta, 1, sizeof(*meta), aesEncryptedOutput);
+
 	std::fwrite(meta, 1, sizeof(*meta), sineOutput);
 
 	//print header data to console
