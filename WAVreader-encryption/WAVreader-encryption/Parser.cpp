@@ -69,7 +69,8 @@ void Parser::readHeader(const header_p &meta, FILE * rsaInput, FILE * xorOutput,
 	{
 		int nb = std::fread(&tmp, 1, 1, rsaInput);
 	}
-
+	if (meta->subchunk1_size[0] == 18) { meta->subchunk1_size[0] = 16; }
+	
 	meta->subchunk2_id[0] = 'd';
 	std::fread(&meta->subchunk2_id[1], 1, 3, rsaInput);
 	std::fread(meta->subchunk2_size, 1, 4, rsaInput);

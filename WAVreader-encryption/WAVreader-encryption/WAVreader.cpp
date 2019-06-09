@@ -1,9 +1,12 @@
 #include "pch.h"
+
 #include <iostream>
-#include "RSA.h"
-#include "XOR.h"
 #include <vector>
 #include <string>
+#include <chrono>
+
+#include "RSA.h"
+#include "XOR.h"
 #include "Parser.h"
 #include "WAVreader.h"
 
@@ -37,7 +40,7 @@ std::string addSineToWave(int count, int nrBytesRead, std::string sineBuffer, Pa
 
 int main()
 {		
-	string filepath = "nature.wav";				    				// choose .wav file to be parsed
+	string filepath = "testSample.wav";				    				// choose .wav file to be parsed
 	
 	constexpr int BUFFERSIZE = BUFSIZ;							    // data chunk size
 
@@ -55,6 +58,7 @@ int main()
 	
 	cout << "-----------XOR-------------" << "\n\n";
 	string plainTextXor = "0123456789";
+	cout << "my PlainText for XOR: " << plainTextXor << endl;
 	cout << "cipher: " << xor.getCipher() << endl;
 	cout << "my encryptedXOR: "  << xor.encryptXorWav(plainTextXor) << endl;
  	cout << "my decryptedXOR: " << xor.encryptXorWav(plainTextXor) << "\n\n";
@@ -74,6 +78,7 @@ int main()
 		std::vector<char> vect;
 		std::vector<cpp_int> mess;
 		
+		auto start = std::chrono::system_clock::now();
 		while ( !feof(parser->inputFile) )
 		{
 			nrBytesRead = std::fread(&buffer[0], 1, buffer.size(), parser->inputFile);						// Reading data from infile to buffer in chunks of BUFSIZE
@@ -96,6 +101,10 @@ int main()
 		}
 
 		cout << "FRAMES: " << count << endl;
+
+		auto end = std::chrono::system_clock::now();
+		std::chrono::duration<double> elapsed_seconds = end - start;
+		std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 	}
 	else
 	{
