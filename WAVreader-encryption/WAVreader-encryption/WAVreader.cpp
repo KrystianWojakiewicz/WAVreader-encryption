@@ -10,6 +10,7 @@
 #include "Parser.h"
 #include "WAVreader.h"
 
+
 using namespace std;
 
 
@@ -44,15 +45,15 @@ int main()
 	
 	constexpr int BUFFERSIZE = BUFSIZ;							    // data chunk size
 
-	RSA <cpp_int> rsa(3);
-	XOR<uint512_t> xor;
+	RSA <uint1024_t> rsa(3);
+	XOR<uint1024_t> xor;
 	Parser * parser = new Parser(filepath);
 	
 	
 	cout << "-----------RSA-------------" << "\n\n";
 	char plainText[] = { "H" };
 	cout << "my PlainText in ASCII: " << (unsigned int)(*plainText) << endl;
-	cpp_int encryptedText = rsa.encryptText((unsigned int)(*plainText));
+	uint1024_t encryptedText = rsa.encryptText((unsigned int)(*plainText));
 	cout << "my encryptedText: " << encryptedText << endl;
 	cout << "my decryptedText: " << rsa.decryptText(encryptedText) << "\n\n";
 	

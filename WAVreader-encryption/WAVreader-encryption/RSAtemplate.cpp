@@ -161,7 +161,7 @@ template <class intType> void RSA<intType>::generatePrivatePublicKeyPair()
 template <class intType> intType RSA<intType>::generatePrime()
 {
 	boost::random::mt19937 gen(std::time(0));
-	boost::random::uniform_int_distribution<intType> dist( 1, std::numeric_limits<short int>::max());
+	boost::random::uniform_int_distribution<intType> dist( 1, std::numeric_limits<short>::max());
 	intType randomNumber = dist(gen);
 	
 	if ((randomNumber % 2) == 0)
