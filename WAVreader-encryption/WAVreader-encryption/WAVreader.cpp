@@ -96,7 +96,7 @@ int main()
 	AESAlgorithm aes;
 
 	
-	std::cout << "Sample encryption/decryption\n";
+	std::cout << "\n\nSample encryption/decryption\n";
 	sampleRSA(rsa);
 	sampleXOR(xor);
 	sampleAES(aes);
@@ -121,21 +121,25 @@ int main()
 			nrBytesRead = std::fread(&buffer[0], 1, buffer.size(), parser->inputFile);						// Reading data from infile to buffer in chunks of BUFSIZE
 			count++;
 			
+			// Adding Sine
 			sineBuffer = addSineToWave(count, nrBytesRead, buffer, parser, 3, 7, 256);
 			std::fwrite(&sineBuffer[0], 1, nrBytesRead, parser->sineOutput);
 			
+			// XOR encryption/decryption
 			xor.encryptXorWav(buffer);
 			std::fwrite(&buffer[0], 1, nrBytesRead, parser->xorEncryptedOutput);
 			
 			xor.encryptXorWav(buffer);
 			std::fwrite(&buffer[0], 1, nrBytesRead, parser->xorOutput);
 			
+			// RSA encryption/decryption
 			mess = rsa.encryptWAV(buffer);
 			std::fwrite(mess.data(), sizeof mess[0], mess.size(), parser->rsaEncryptedOutput);
 			
 			vect = rsa.decryptWAV(mess);
 			std::fwrite(vect.data(), 1, vect.size(), parser->rsaOutput);
 
+			// AES encryption/decryption
 			std::string aesCipherText = aes.encryptWAV(buffer, nrBytesRead); 
 			std::fwrite(&aesCipherText[0], 1, nrBytesRead, parser->aesEncryptedOutput);
 

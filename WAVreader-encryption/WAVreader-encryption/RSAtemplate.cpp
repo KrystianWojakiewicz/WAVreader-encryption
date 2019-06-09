@@ -5,6 +5,7 @@
 #include "RSA.h"
 #include <boost/multiprecision/cpp_int.hpp>
 
+
 template <class intType>
 struct Euclid
 {
@@ -18,79 +19,6 @@ struct Euclid
 	intType divider;
 };
 
-/*HELPER FUNCTIONS*/
-
-template <class intType> intType myPow(intType x, intType p) // TODO:remove
-{
-	if (p == 0) return 1;
-	if (p == 1) return x;
-
-	intType tmp = myPow(x, p / 2);
-	if (p % 2 == 0) return tmp * tmp;
-	else return x * tmp * tmp;
-}
-
-template <class intType> bool RSA<intType>::combinationFound(intType power, intType exp) // TODO:remove
-{
-	intType totalExp = 0;
-	int count = this->ans.size() - 1;
-	while (count >= 0)
-	{
-		intType tmp;
-		if (count == 0)
-		{
-			tmp = 0;
-		}
-		else
-		{
-			tmp = myPow(2, count - 1);
-		}
-
-		totalExp += tmp;
-		if (totalExp > power)
-		{
-			totalExp -= tmp;
-		}
-		else if (totalExp < power)
-		{
-			this->powerAnswerSeq.push_back(count);
-		}
-		else
-		{
-			this->powerAnswerSeq.push_back(count);
-			return true;
-		}
-		count--;
-	}
-	powerAnswerSeq.clear();
-	return false;
-}
-
-template <class intType> intType RSA<intType>::RSApowersImproved(intType base, intType power) // TODO:remove
-{
-	intType exp = 0;
-	while (!combinationFound(power, exp))
-	{
-		if (exp == 0)
-		{
-			this->ans.push_back(1); // 2^0
-			exp = 1;
-			continue;
-		}
-		intType answer = RSApowers(base, exp);
-		exp *= 2;
-		this->ans.push_back(answer);
-	}
-
-	intType endResult = 1;
-	std::vector<int>::iterator it;
-	for (it = this->powerAnswerSeq.begin(); it != this->powerAnswerSeq.end(); it++)
-	{
-		endResult = (endResult * ans.at(*it)) % this->modulus;
-	}
-	return endResult;
-}
-
 
 template <class intType>  intType RSA<intType>::RSApowers(intType x, intType p) const
 {
@@ -101,10 +29,6 @@ template <class intType>  intType RSA<intType>::RSApowers(intType x, intType p) 
 	if (p % 2 == 0) return tmp * tmp % this->modulus;
 	else return x * tmp * tmp % this->modulus;
 }
-
-/*END OF HELPER FUNCTIONS*/
-
-
 
 template <class intType> RSA<intType>::RSA()
 {
