@@ -1,3 +1,4 @@
+#pragma once
 #include "pch.h"
 
 #include <iostream>
@@ -9,9 +10,8 @@
 #include "XOR.h"
 #include "Parser.h"
 #include "WAVreader.h"
+#include "AESAlgorithm.h"
 
-
-using namespace std;
 
 
 std::string addSineToWave(int count, int nrBytesRead, std::string sineBuffer, Parser* parser, int signalStartSec, int signalEndSec, int period)
@@ -39,47 +39,82 @@ std::string addSineToWave(int count, int nrBytesRead, std::string sineBuffer, Pa
 	return sineBuffer;
 }
 
+void sampleRSA(RSA<boost::multiprecision::uint1024_t> &rsa)
+{
+	std::cout << "-----------RSA-------------" << "\n\n";
+
+	std::string plainText = "Hello World!";
+	std::cout << "my PlainText in ASCII: " << plainText << std::endl;
+
+	std::vector<cpp_int> encryptedVec = rsa.encryptWAV(plainText);
+	std::string encryptedText;
+	for (int i = 0; i < encryptedVec.size(); i++)
+	{
+		encryptedText += boost::lexical_cast<std::string>(encryptedVec[i]);
+	}
+	std::cout << "my encryptedText: " << encryptedText << std::endl;
+
+
+	std::vector<char> decryptedVec = rsa.decryptWAV(encryptedVec);
+	std::string decryptedText;
+	for (int i = 0; i < decryptedVec.size(); i++)
+	{
+		decryptedText += boost::lexical_cast<std::string>(decryptedVec[i]);
+	}
+	std::cout << "my decryptedText: " << decryptedText << "\n\n";
+}
+
+void sampleXOR(XOR<boost::multiprecision::uint1024_t> &xor)
+{
+	std::cout << "-----------XOR-------------" << "\n\n";
+	std::string plainTextXor = "0123456789";
+	std::cout << "my PlainText for XOR: " << plainTextXor << std::endl;
+	std::cout << "cipher: " << xor.getCipher() << std::endl;
+	std::cout << "my encryptedXOR: " << xor.encryptXorWav(plainTextXor) << std::endl;
+	std::cout << "my decryptedXOR: " << xor.encryptXorWav(plainTextXor) << "\n\n";
+}
+
+void sampleAES(AESAlgorithm &aes)
+{
+	std::cout << "-----------AES-------------" << "\n\n";
+	std::cout << "Encrypted AES: "; aes.EncryptEAS(); std::cout << "\n";
+	std::cout << "Decrypted AES: "; aes.DecryptEAS(); std::cout << "\n";
+}
+
+
+
 int main()
 {		
-	string filepath = "testSample.wav";				    				// choose .wav file to be parsed
+	std::string filepath = "testSample.wav";				    				// choose .wav file to be parsed
+	constexpr int BUFFERSIZE = BUFSIZ;											// data chunk size
 	
-	constexpr int BUFFERSIZE = BUFSIZ;							    // data chunk size
-
-	RSA <uint1024_t> rsa(3);
-	XOR<uint1024_t> xor;
 	Parser * parser = new Parser(filepath);
 	
-	
-	cout << "-----------RSA-------------" << "\n\n";
-	char plainText[] = { "H" };
-	cout << "my PlainText in ASCII: " << (unsigned int)(*plainText) << endl;
-	uint1024_t encryptedText = rsa.encryptText((unsigned int)(*plainText));
-	cout << "my encryptedText: " << encryptedText << endl;
-	cout << "my decryptedText: " << rsa.decryptText(encryptedText) << "\n\n";
-	
-	cout << "-----------XOR-------------" << "\n\n";
-	string plainTextXor = "0123456789";
-	cout << "my PlainText for XOR: " << plainTextXor << endl;
-	cout << "cipher: " << xor.getCipher() << endl;
-	cout << "my encryptedXOR: "  << xor.encryptXorWav(plainTextXor) << endl;
- 	cout << "my decryptedXOR: " << xor.encryptXorWav(plainTextXor) << "\n\n";
+	RSA <uint1024_t> rsa(3);
+	XOR<uint1024_t> xor;
+	AESAlgorithm aes;
 
+	
+	std::cout << "Sample encryption/decryption\n";
+	sampleRSA(rsa);
+	sampleXOR(xor);
+	sampleAES(aes);
 	
 	if (parser->inputFile)
 	{								
 		int nrBytesRead = 0;																				// variable storing number of bytes returned
 		int count = 0;																						// frame counter
 
-		string buffer;
+		std::string buffer;
 		buffer.resize(BUFFERSIZE);
 		
-		string sineBuffer;
+		std::string sineBuffer;
 		sineBuffer.resize(BUFFERSIZE);
 
 		std::vector<char> vect;
 		std::vector<cpp_int> mess;
 		
-		auto start = std::chrono::system_clock::now();
+		auto start = std::chrono::system_clock::now();														// TIME START
 		while ( !feof(parser->inputFile) )
 		{
 			nrBytesRead = std::fread(&buffer[0], 1, buffer.size(), parser->inputFile);						// Reading data from infile to buffer in chunks of BUFSIZE
@@ -101,19 +136,20 @@ int main()
 			std::fwrite(vect.data(), 1, vect.size(), parser->rsaOutput);
 		}
 
-		cout << "FRAMES: " << count << endl;
+		std::cout << "FRAMES: " << count << std::endl;
 
-		auto end = std::chrono::system_clock::now();
+		auto end = std::chrono::system_clock::now();														// TIME STOP
 		std::chrono::duration<double> elapsed_seconds = end - start;
 		std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 	}
 	else
 	{
-		cout << "can't open file";
+		std::cout << "can't open file";
 	}
 	
 	delete parser;
 
 	return 0;
 }
+
 

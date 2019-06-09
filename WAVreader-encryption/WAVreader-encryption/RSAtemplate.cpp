@@ -108,24 +108,24 @@ template <class intType>  intType RSA<intType>::RSApowers(intType x, intType p) 
 
 template <class intType> RSA<intType>::RSA()
 {
-	cout << "-------RSA CONFIG-------" << "\n\n";
-	cout << "\nmodulus: " << generateModulus() << endl;
-	cout << "Random Primes: " << getPrimeP() << " :: " << getPrimeQ() << endl;
-	cout << "Euler Totient: " << calculateEulerTotient() << endl;
+	std::cout << "-------RSA CONFIG-------" << "\n\n";
+	std::cout << "\nmodulus: " << generateModulus() << std::endl;
+	std::cout << "Random Primes: " << getPrimeP() << " :: " << getPrimeQ() << std::endl;
+	std::cout << "Euler Totient: " << calculateEulerTotient() << std::endl;
 	generatePrivatePublicKeyPair();
-	cout << "Public Key: " << getPublicKey() << endl;
-	cout << "Private Key: " << getPrivateKey() << "\n\n";
+	std::cout << "Public Key: " << getPublicKey() << std::endl;
+	std::cout << "Private Key: " << getPrivateKey() << "\n\n";
 }
 
 template <class intType> RSA<intType>::RSA(intType publicKeyDefault) : publicKey(publicKeyDefault)
 {
-	cout << "-------RSA CONFIG-------" << "\n\n";
-	cout << "modulus: " << generateModulusPublicKeyInitialized() << endl;
-	cout << "Random Primes: " << getPrimeP() << " :: " << getPrimeQ() << endl;
-	cout << "Euler Totient: " << calculateEulerTotient() << endl;
+	std::cout << "-------RSA CONFIG-------" << "\n\n";
+	std::cout << "modulus: " << generateModulusPublicKeyInitialized() << std::endl;
+	std::cout << "Random Primes: " << getPrimeP() << " :: " << getPrimeQ() << std::endl;
+	std::cout << "Euler Totient: " << calculateEulerTotient() << std::endl;
 	doEuclidsExtendedAlgorithm();
-	cout << "Public Key: " << getPublicKey() << endl;
-	cout << "Private Key: " << getPrivateKey() << "\n\n";
+	std::cout << "Public Key: " << getPublicKey() << std::endl;
+	std::cout << "Private Key: " << getPrivateKey() << "\n\n";
 }
 
 template <class intType> intType RSA<intType>::generateModulusPublicKeyInitialized()
