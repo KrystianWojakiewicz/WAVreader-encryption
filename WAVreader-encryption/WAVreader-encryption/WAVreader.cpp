@@ -43,7 +43,7 @@ void sampleRSA(RSA<boost::multiprecision::uint1024_t> &rsa)
 {
 	std::cout << "-----------RSA-------------" << "\n\n";
 
-	std::string plainText = "Hello World!";
+	std::string plainText = "HELLO WORLD!";
 	std::cout << "my PlainText in ASCII: " << plainText << std::endl;
 
 	std::vector<cpp_int> encryptedVec = rsa.encryptWAV(plainText);
@@ -67,7 +67,7 @@ void sampleRSA(RSA<boost::multiprecision::uint1024_t> &rsa)
 void sampleXOR(XOR<boost::multiprecision::uint1024_t> &xor)
 {
 	std::cout << "-----------XOR-------------" << "\n\n";
-	std::string plainTextXor = "0123456789";
+	std::string plainTextXor = "HELLO WORLD!";
 	std::cout << "my PlainText for XOR: " << plainTextXor << std::endl;
 	std::cout << "cipher: " << xor.getCipher() << std::endl;
 	std::cout << "my encryptedXOR: " << xor.encryptXorWav(plainTextXor) << std::endl;
